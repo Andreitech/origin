@@ -3,19 +3,17 @@ API_KEY=PSKINdQe1GyxGgecYz2191H2JoS9qvgD
 echo "API=$API_KEY"
 echo Введите код страны
 read cod
-
-echo Введите название города
-#read city
 #Условие поиска
-SEARCH_FOR="html:'/login.rsp' country:'$cod'"
+SEARCH_FOR="html:'/device.rsp' country:'$cod'"
 echo $SEARCH_FOR
 shodan init $API_KEY
 #Поиск ip
 shodan search --fields ip_str $SEARCH_FOR --limit 10 > ip$cod
-wc -l ip$cod
+echo 'wc -l ip$cod'
 
 #Поиск port
 shodan search --fields port $SEARCH_FOR --limit 10 > port$cod
+echo 'wc -l port$cod'
 
 while read line; do echo "$line:"; done < ip$cod > ipp$cod
 paste ipp$cod port$cod > ok$cod

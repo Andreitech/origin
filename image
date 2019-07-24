@@ -1,0 +1,1745 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title id="FrameTitle">View DVR</title>
+	<link href="/HAPPLE/pages/Styles/page.css?v192" rel="stylesheet" type="text/css" />
+    <link href="/HAPPLE/pages/sysTips/sysTipsStyle.css?Vv192" rel="stylesheet" type="text/css" />
+
+	<script type="text/javascript" src="/HAPPLE/js/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="/HAPPLE/js/rspDevice.js?v192"></script>
+	<script type="text/javascript" src="/HAPPLE/js/rspFrame.js?v192"></script>
+	<script type="text/javascript" src="/HAPPLE/js/userControl/rspDropdown.js?v192"></script>
+    
+    <script type="text/javascript" src="/HAPPLE/js/userControl/timeContor.js?v192"></script>
+	<script type="text/javascript" src="/HAPPLE/js/userControl/rspGetElement.js?v192"></script>
+	<script type="text/javascript" src="/HAPPLE/js/userControl/rspButton.js?v192"></script>
+    <script type="text/javascript" src="/HAPPLE/js/userControl/rspBox.js?v192"></script>
+    <script type="text/javascript" src="/HAPPLE/js/rspConfigure.js?v192"></script>
+    <script type="text/javascript" src="/language.rsp"></script>
+    <script type="text/javascript" src="/HAPPLE/pages/sysTips/sysTipsJs.js?v192"></script>
+    <script type="text/javascript" src="/HAPPLE/js/liveview.js?v192"></script>
+    <script type="text/javascript" src="/HAPPLE/js/playback.js?v192"></script>
+
+     
+	<script type="text/javascript">
+		
+		
+		var numk = 0;
+	    function UploadBackupProcess(BackupKey, ulFlag, TotalLen, CurLen, percent) {
+	        RM.frame.getDevice().backupProcess(BackupKey, ulFlag, percent);
+	    }
+		function ReTurnPreviewActiveChl(ulActiveChannel){
+			if(RM.frame.getDevice().getActiveChannel()>=0&&RM.frame.getDevice().getActiveChannel()<=RM.SYS.MAX_CHL_NUM){
+				refer_value(2);
+			}
+			if(RM.frame.getDevice().getActiveChannel() <= 3 && RM.SYS.product_type == "9216XH_VA")
+			{
+				 $("#diabledBydisplay div").attr("disabled","true");
+				$("#ytspeed").attr("disabled","true");
+				$("#ytspeedRemove").attr("disabled","true");
+			 }else{
+				$("#diabledBydisplay div").removeAttr("disabled");
+				$("#ytspeed").removeAttr("disabled");
+				$("#ytspeedRemove").removeAttr("disabled");
+			 }
+		}
+		
+		
+		function ReTurnPreviewAllChannelState(ulforcedlogout, ulstate) {
+		
+			if( ulforcedlogout == 0 )
+			{
+				if( ulstate == 0 )
+				{
+					// RM.frame.getDevice().stopPreviewAll();
+						//document.getElementById("dvrplug").StopPreviewAll(RM.frame.getDevice().gethandle());
+						$("#startOrStopview").attr("class","content_right_bottom_image_13");
+						$("#startOrStopview").attr("value","false");
+						//document.getElementById("dvrplug").StopRecord(RM.frame.getDevice().gethandle(),0);
+						document.getElementById("Fullscreen").className="content_right_bottom_image_2";
+						document.getElementById("Fullscreen").value="false";
+						document.getElementById("MainStream").disabled=true;
+						document.getElementById("SonStream").disabled=true;
+						rsp_setCookie(" startOrStop","false");
+				}
+				else
+				{
+					$("#startOrStopview").attr("class","content_right_bottom_image_down_13");
+					$("#startOrStopview").attr("value","true");
+					document.getElementById("MainStream").disabled=false;
+					document.getElementById("SonStream").disabled=false;
+					
+					rsp_setCookie(" startOrStop","true");
+				}
+			}
+			else if( ulforcedlogout == 1 )
+			{
+				if( ulstate==0 )
+				{
+					//ocument.getElementById("dvrplug").StopRecord(RM.frame.getDevice().gethandle(),0);
+					document.getElementById("Fullscreen").className="content_right_bottom_image_2";
+					document.getElementById("Fullscreen").value="false";
+				}
+				else
+				{
+					//document.getElementById("dvrplug").StartRecord(RM.frame.getDevice().gethandle(),0,0);
+					
+						document.getElementById("Fullscreen").className="content_right_bottom_image_down_2";
+						document.getElementById("Fullscreen").value="true";
+				}
+			}
+		    else if (ulforcedlogout == 2) {
+		        RM.frame.getDevice().logout();
+		        alert("" + RM.language.IE_BEFORCED_OFFLINE + "");
+		        window.location = "/login.rsp";
+		    }
+		    else if (ulforcedlogout == 3) {
+		        if (ulstate == 1 && RM.frame.getDevice().getStreamType() != 1 ){
+		            document.getElementById("SonStream").className = "content_right_bottom_image_5";
+		            document.getElementById("SonStream").value = "false";
+		            document.getElementById("MainStream").className = "content_right_bottom_image_down_4";
+		            document.getElementById("MainStream").value = "true";
+		            RM.frame.getDevice().changeStreamTypeByDevice(1);
+		        }
+		        if (ulstate == 0 && RM.frame.getDevice().getStreamType() != 0) {
+		            document.getElementById("MainStream").className = "content_right_bottom_image_4";
+		            document.getElementById("MainStream").value = "false";
+		            document.getElementById("SonStream").className = "content_right_bottom_image_down_5";
+		            document.getElementById("SonStream").value = "true";
+		            RM.frame.getDevice().changeStreamTypeByDevice(0);
+		        }
+		    }
+			
+			else if(ulforcedlogout == 4)
+			{
+				$("#reviewDig").attr("class","content_right_bottom_image_14");
+				$("#reviewDig").attr("value","false");
+				document.getElementById("dvrplug").PreviewDigitalRoomControl(RM.frame.getDevice().gethandle(),0);
+			}
+			else if( ulforcedlogout == 5 )
+			{
+				document.getElementById('Talkback').value = 'false';
+				document.getElementById('Talkback').className = 'content_right_bottom_image_talkback';
+			}
+			else if( ulforcedlogout == 6 )
+			{
+				if( ulstate == 0 )
+				{
+					document.getElementById("setPreview").value="false";
+					document.getElementById("setPreview").className="content_right_bottom_image_onmouse_18";
+					rsp_setCookie("maxbol","false");
+				}
+				else if( ulstate == 1 )
+				{	
+					document.getElementById("setPreview").value="true";
+					document.getElementById("setPreview").className="content_right_bottom_image_onmouse_18_1";
+					rsp_setCookie("maxbol","true");
+				}
+				a = 0;
+				resizePlaybackWindow();
+				RM.frame.changeUrl("/playback.rsp",1);
+			}
+		}
+	    RM.box = new rspBox("g_box", "g_box", 0, "/HAPPLE/images/rspbox_border_bg.gif", "/HAPPLE/images/rspbox_content_bg.gif", "/HAPPLE/images/rsp_box_title_bg.jpg");
+	</script>
+</head>
+<!--[if IE 6]>
+<script language="JavaScript" type="text/javascript" src="/HAPPLE/pages/JS/_png.js"></script>
+<script>
+DD_belatedPNG.fix('.png');
+</script>
+<![endif]-->
+<body onload="RM.frame.initPage();"  onunload="javascript:clearCookie_Encoding()">
+
+<object id="dvrplug" name="dvrplug" codebase="N9DvrOcx.cab?V1167#version=1,1,6,7" event="UploadBackupProcess(BackupKey, ulFlag, TotalLen, CurLen, percent);" style="height:0px;width:0px;position:absolute;" classid="clsid:9AA03FEC-6582-48B1-BC62-821D4A7B9461"></object>
+<script language="javascript" type="text/javascript" for="dvrplug" event="UploadBackupProcess(BackupKey, ulFlag, TotalLen, CurLen, percent);">
+   UploadBackupProcess(BackupKey, ulFlag, TotalLen, CurLen, percent);
+</script>
+<script language="javascript" type="text/javascript" for="dvrplug" event="ReTurnPreviewActiveChl(ulActiveChannel);">
+   ReTurnPreviewActiveChl(ulActiveChannel );
+</script>
+<script language="javascript" type="text/javascript" for="dvrplug" event="ReTurnPreviewAllChannelState(ulforcedlogout,ulstate);">
+   ReTurnPreviewAllChannelState(ulforcedlogout,ulstate);
+</script>
+
+
+<div class="head-border" id="head-border">
+
+	<div class="head-logo">
+		<img src="/HAPPLE/logo/logo_viewdvr.png" class="sdf png" style="margin-top:15px;margin-left:8px;" />
+	</div>
+	<ul class="head-menu-border">
+		<li> 
+			<script type="text/javascript">
+
+			new rspButton({ id: "btn_liveView", name: "btn_liveView", text: "Наблюдение", height: 33, bgimg: "/HAPPLE/images/menubutton.jpg?"+RM.SYS.custName, onclick: 'liveViewClick()' });
+
+		function liveViewClick()
+		{
+			if(window.document.URL.split("#")[1]!="/liveView.rsp")
+			{
+				RM.frame.loadPage("/liveView.rsp"); 
+			}
+			jQuery("#btn_liveView").css("color","#01CDFF");
+			jQuery("#btn_configure").css("color","black");
+			jQuery("#btn_playback").css("color","black");
+			
+			
+			if(RM.SYS.priwe == "true" && rsp_getCookie("startOrStop") !=  "false")
+			{
+				document.getElementById("startOrStopview").value="true";
+				document.getElementById("startOrStopview").className="content_right_bottom_image_down_13";
+				document.getElementById("MainStream").disabled=false;
+				document.getElementById("SonStream").disabled=false;
+			}
+			else
+			{
+				document.getElementById("startOrStopview").value="false";
+				document.getElementById("startOrStopview").className="content_right_bottom_image_13";
+				if( rsp_getCookie("startOrStop") != "true" )
+				{
+					document.getElementById("MainStream").disabled=true;
+					document.getElementById("SonStream").disabled=true;
+				}
+			}
+			
+			if( rsp_getCookie("startOrStop") == "true" )
+			{
+				var streaming=rsp_getCookie("EncodingVlaue");
+				if (streaming == '') { streaming = 0; };
+				//RM.frame.getDevice().startAllPreview(parseInt(streaming));
+				$("#startOrStopview").attr("class","content_right_bottom_image_down_13");
+				$("#startOrStopview").attr("value","true");
+			}
+			
+			
+			
+			setTimeout(function(){
+				if(rsp_getCookie("scren") != "true")
+				{
+					//document.getElementById("dvrplug").StopRecord(RM.frame.getDevice().gethandle(),0);
+					document.getElementById("Fullscreen").className="content_right_bottom_image_2";
+					document.getElementById("Fullscreen").value="false";
+					rsp_setCookie("scren","false");
+				}
+				else
+				{
+					//document.getElementById("dvrplug").StartRecord(RM.frame.getDevice().gethandle(),0,0);
+					//document.getElementById("Fullscreen").className="content_right_bottom_image_down_2";
+					document.getElementById("Fullscreen").value="true";
+					rsp_setCookie("scren","true");
+				}
+			},1000);
+			resizeViewWindow();
+		}
+		
+		if(window.document.URL.split('#')[1]=="/liveView.rsp"||window.document.URL.split('#')[1]==undefined){
+            jQuery("#btn_liveView").css("color","#01CDFF");
+		}
+            </script>
+		</li>
+		<li>
+			<script type="text/javascript">new rspButton({ id: "btn_playback", name: "btn_playback", text: "Просмотр", height: 33, bgimg: "/HAPPLE/images/menubutton.jpg?"+RM.SYS.custName,onclick: 'RM.frame.loadPage(\"/playback.rsp\");jQuery("#btn_playback").css("color","#01CDFF");jQuery("#btn_liveView").css("color","black");jQuery("#btn_configure").css("color","black");document.getElementById("Talkback").value="false";document.getElementById("Talkback").className="content_right_bottom_image_talkback";jQuery("#head-border").css("width","100%");perIds.length = 0;backup.length = 0;' });</script>
+		</li>
+		<li>
+			<script type="text/javascript"> new rspButton({ id: "btn_configure", name: "btn_configure", text: "Конфигурация", height: 33, bgimg: "/HAPPLE/images/menubutton.jpg?"+RM.SYS.custName, onclick: 'RM.frame.loadPage(\"/left.rsp\");jQuery("#btn_configure").css("color","#01CDFF");jQuery("#btn_liveView").css("color","black");jQuery("#btn_playback").css("color","black");jQuery.fn.sysTips({title:RM.language.SystemTips,tips:RM.language.LoadingParameter,type:"-1"});document.getElementById("Talkback").value="false";document.getElementById("Talkback").className="content_right_bottom_image_talkback";jQuery("#head-border").css("width","99.6%");RM.plug.getPlug().SwitchPage(1);' });
+            
+            </script>
+		</li>
+	</ul>
+    <!-- <div style="margin-top:30px;"> <a href="javascript:void(0)" onclick="window.document.URL='http://www.max-secure.com.my'" style="color:#fff; text-decoration:none">www.max-secure.com.my</a></div>-->
+	<div class="head-info-border">
+    	
+	    <input id="btn_head_logout" type="button" onclick="if(RM.frame.getDevice()){RM.frame.getDevice().logout();}window.location.href='/logincheck.rsp?method=logout'" class='head-logout-out' onmouseover="this.className='head-logout-over'" onmouseout="this.className='head-logout-out'" onmousedown="this.className='head-logout-down'" onmouseup="this.className='head-logout-over'" />
+      <input type="button" class="head-plug-reserver png" onmouseover="this.className='head-plug-reserver-onmouse'" onmouseout="this.className='head-plug-reserver'" onmousedown="this.className='head-plug-reserver-down'" onclick="if(RM.frame.getDevice()){document.getElementById('dvrplug').OpenAviConvertionDialog();}" title="AVI Converter"/>
+
+	 <!--<input type="button" style=" background:#23272C;color:#fff;float:right; margin-top:25px; margin-right:30px; cursor:pointer" onclick="document.location='http://www.max-secure.com.my'" value="www.max-secure.com.my"/>-->
+
+
+	    <script type="text/javascript">
+	     
+	    </script>
+	</div>
+        
+</div>
+<script type="text/javascript">
+    var locationUrl = window.location.href;
+    if (locationUrl.indexOf("islogout=0") > 0) {
+        document.getElementById("btn_head_logout").style.display = 'none';
+    }
+    if (locationUrl.indexOf("showheader=0") > 0) {
+        document.getElementById("head-border").style.display = 'none';
+    }
+	//plug param
+	var customId = "0";
+	if( customId == "" )
+	{
+		customId = 0;
+	}
+	else
+	{
+		customId = parseInt(customId);
+	}
+	document.getElementById("dvrplug").SetClientID(customId);
+	var url = window.document.URL;
+	var por = url.split(':');
+	
+	if(por[2] != undefined)
+	{
+		var port;
+		if(por[2].indexOf('/')>0)
+		{
+			port = por[2].substring(0,por[2].indexOf('/'));
+		}
+		else
+		{
+			port = por[2];
+		}
+	
+		if(!isNaN(port))
+		{
+			document.getElementById("dvrplug").SetWebport(port);
+		}
+	}
+	
+	function clearCookie_Encoding()
+	{rsp_setCookie("EncodingVlaue","");}
+	
+	if(RM.SYS.custName != "CUSTOMER_NULL")
+	{
+		$(".head-plug-reserver").hide();
+	}
+</script>
+
+<div id="content_body_border_liveview">
+<script type="text/javascript">
+	jQuery(document).ready(initPages());
+	function initPages(){
+		if(RM.power.ptz){
+			jQuery(".conten_left_down div").removeAttr("disabled");
+		}
+		else{
+		    jQuery(".conten_left_down div").css("disabled", "false");
+		}
+	}
+
+</script>
+<div class="playback_content_left" id="content_left">
+    <div class="content_left_left" id="content_left_left" style=" float:left;">
+        <div class="conten_left_top">
+          <div class="imagesbotton_5_bottom png" id="btt">
+        	<label style="color:#BCBCBC; position:absolute;left:50px;top:11px"><b>PTZ</b></label>
+        </div>
+            <div class="conten_left_down png" id="conten_left_down">
+                <div class="conten_left_down_png png">
+                  <div class="conten_left_down_1 png" id="down1" 
+                  onmouseover="ytattrClassBybackground('conten_left_down_onmouse_1',this.id)" 
+                  onmouseout="ytattrClassBybackground('conten_left_down_1',this.id);RM.ptz.stop();"
+                  onmouseup="RM.ptz.stop();"
+                  onmousedown="RM.ptz.up();" >
+                  </div>
+                  
+                   <div class="conten_left_down_2 png" id="down2" 
+                   onmouseover="ytattrClassBybackground('conten_left_down_onmouse_2',this.id)" 
+                   onmouseout="ytattrClassBybackground('conten_left_down_2',this.id);RM.ptz.stop();" 
+                   onmouseup="RM.ptz.stop();"
+                   onmousedown=";RM.ptz.down()" >
+                   </div>
+                   
+                    <div class="conten_left_down_3 png" id="down3" 
+                    onmouseover="ytattrClassBybackground('conten_left_down_onmouse_3',this.id)" 
+                    onmouseout="ytattrClassBybackground('conten_left_down_3',this.id);RM.ptz.stop();"
+                    onmouseup="RM.ptz.stop();"
+                    onmousedown="RM.ptz.right()">
+                    </div>
+                    
+                     <div class="conten_left_down_4 png" id="down4" 
+                     onmouseover="ytattrClassBybackground('conten_left_down_onmouse_4',this.id)" 
+                     onmouseout="ytattrClassBybackground('conten_left_down_4',this.id);RM.ptz.stop();"
+                     onmouseup="RM.ptz.stop();"
+                     onmousedown="RM.ptz.up_right()">
+                     </div>
+                     
+                     <div class="conten_left_down_5 png" id="down5" 
+                     onmouseover="ytattrClassBybackground('conten_left_down_onmouse_5',this.id)" 
+                     onmouseout="ytattrClassBybackground('conten_left_down_5',this.id);RM.ptz.stop();"
+                     onmouseup="RM.ptz.stop();"
+                     onmousedown="RM.ptz.down_right()">
+                     </div>
+                    
+                     <div class="conten_left_down_6 png" id="down6" 
+                     onmouseover="ytattrClassBybackground('conten_left_down_onmouse_6',this.id)" 
+                     onmouseout="ytattrClassBybackground('conten_left_down_6',this.id);RM.ptz.stop();" 
+                     onmouseup="RM.ptz.stop();"
+                     onmousedown="RM.ptz.left()">
+                     </div>
+                    
+                     <div class="conten_left_down_7 png" id="down7" 
+                     onmouseover="ytattrClassBybackground('conten_left_down_onmouse_7',this.id)" 
+                     onmouseout="ytattrClassBybackground('conten_left_down_7',this.id);RM.ptz.stop();"
+                     onmouseup="RM.ptz.stop();"
+                     onmousedown="RM.ptz.up_left()">
+                     </div>
+                     
+                     <div class="conten_left_down_8 png" id="down8" 
+                     onmouseover="ytattrClassBybackground('conten_left_down_onmouse_8',this.id)" 
+                     onmouseout="ytattrClassBybackground('conten_left_down_8',this.id);RM.ptz.stop();"
+                     onmouseup="RM.ptz.stop();"
+                     onmousedown="RM.ptz.down_left()">
+                     </div>
+                     
+                     <div class="ok png" id="ko" 
+                     onmouseover="ytattrClassBybackground('ok_1',this.id)" 
+                     onmouseout="ytattrClassBybackground('ok',this.id);" 
+                     onmousedown="ytattrClassBybackground('ok_2',this.id);RM.ptz.auto();" 
+                     onmouseup="ytattrClassBybackground('ok_1',this.id);">
+                     </div>
+                     
+                     <div class="ytSetting_1 png" id="ytSet1"
+                      onmouseover="ytattrClassBybackground('ytSetting_onmouse_1',this.id)" 
+                      onmouseout="ytattrClassBybackground('ytSetting_1',this.id)"
+                      onmousedown="RM.ptz.brushstart()" title="дворник">
+                      </div>
+                      
+                     <div class="ytSetting_2 png" id="ytSet2" 
+                     onmouseover="ytattrClassBybackground('ytSetting_onmouse_2',this.id)" 
+                     onmouseout="ytattrClassBybackground('ytSetting_2',this.id)"
+                     title="свет" onmousedown="RM.ptz.lightopen();">
+                     </div>
+                     
+                     <div class="ytSetting_3 png" id="ytSet3" 
+                     onmouseover="ytattrClassBybackground('ytSetting_onmouse_3',this.id)" 
+                     onmouseout="ytattrClassBybackground('ytSetting_3',this.id)"
+                     onmousedown="RM.ptz.irisdec()"
+                     onmouseup="RM.ptz.stop();" title="диафр-">
+                     </div>
+                     
+                     <div class="ytSetting_4 png" id="ytSet4" 
+                     onmouseover="ytattrClassBybackground('ytSetting_onmouse_4',this.id)" 
+                     onmouseout="ytattrClassBybackground('ytSetting_4',this.id)"
+                     onmousedown="RM.ptz.irisinc()"
+                     onmouseup="RM.ptz.stop();" title="диафр+">
+                     </div>
+                     
+                     <div class="ytSetting_5 png" id="ytSet5" 
+                     onmouseover="ytattrClassBybackground('ytSetting_onmouse_5',this.id)" 
+                     onmouseout="ytattrClassBybackground('ytSetting_5',this.id)"
+                     onmousedown="RM.ptz.focusdec()"
+                     onmouseup="RM.ptz.stop();" title="фокус-">
+                     </div>
+                     
+                     <div class="ytSetting_6 png" id="ytSet6" 
+                     onmouseover="ytattrClassBybackground('ytSetting_onmouse_6',this.id)" 
+                     onmouseout="ytattrClassBybackground('ytSetting_6',this.id)"
+                     onmousedown="RM.ptz.focusinc()"
+                     onmouseup="RM.ptz.stop();" title="фокус+">
+                     </div>
+                     
+                     <div class="ytSetting_7 png" id="ytSet7" 
+                     onmouseover="ytattrClassBybackground('ytSetting_onmouse_7',this.id)" 
+                     onmouseout="ytattrClassBybackground('ytSetting_7',this.id)"
+                     onmousedown="RM.ptz.zoominc()"
+                     onmouseup="RM.ptz.stop();" title="увелич+">
+                     </div>
+                     
+                     <div class="ytSetting_8 png" id="ytSet8" 
+                     onmouseover="this.className='ytSetting_onmouse_8'" 
+                     onmouseout="ytattrClassBybackground('ytSetting_8',this.id)"
+                     onmousedown="RM.ptz.zoomdec()"
+                     onmouseup="RM.ptz.stop();" title="увелич-">
+                     </div>
+                     
+                     <script type="text/javascript">
+                     	function ytattrClassBybackground(backClass,id){
+							document.getElementById(id).className=backClass;
+						}
+                     </script>
+
+
+
+                </div>
+                
+                <div style="width:100%;height:25px;line-height:25px;margin-top:-5px; margin-left:10px;_margin-left:0px;_position:relative;">
+               		 <div class="ytsheep_1 png" title="PTZ скорость-" style=" margin-left:5px;"></div>
+                       <div class="content_left_content_2_bgImage1 png" id="ytspeed" onclick="GetPostion(event,'ytspeedRemove',2)" >
+                        <div class="content_left_content_1_remove png" id="ytspeedRemove" onmousedown="remoceGetxy(this)" style="display:inline;"></div>
+                    </div>
+                     <div class="ytsheep_2 png" title="PTZ скорость+">
+                     </div> 
+               </div>
+                <!--<input id="ytzs" style="height:20px; width:15px; line-height:20px; border:0px; background-color:#23272C; color:#FFF; float:right; margin-right:12px;margin-top:-23px;*margin-top:-20px; *margin-left:-5px;_position:absolute;_left:178px;" disabled="true" value="33" />-->
+                <label id="ytzs" style="height:20px; width:15px; line-height:20px;color:#FFF; float:right; margin-right:8px;margin-top:-23px;*margin-top:-20px; *margin-left:-5px;_position:absolute;_left:178px;"><font>33</font></label>
+             </div>
+             
+             
+             <div style="width:100%;margin-top:30px;_margin-top:0px;margin-left:10px;" id="sdffff">
+             <ul class="yzd_jiange"></ul>
+             	<ul>
+                	<li style="width:100%;color:#FFF;text-align:left; margin-left:0px; color:#BCBCBC;" id="ptz_preset_text"><b>Пресет</b></li>
+                </ul>
+                <ul style="height:20px;line-height:20px;">
+                	<li style="width:50%; float:left;" >
+                    <div id="yuzhid" style="position:absolute; z-index:9999;left:10px; text-align:left;"></div>
+                    <script>
+					var yz=[];
+					for(var i=1;i<=255;i++){
+						yz[i-1]={value:i,text:i}
+					}
+                    	 var yeardrop = new rspDropbox("yuzd", "yzd", yz,
+													   "/HAPPLE/images/rspPlaybackdrop_bg.gif?" + RM.SYS.custName, 115, 22, 23, "", 12);
+						 jQuery("#yuzhid").html(yeardrop.getStyle()+yeardrop.getHtml());
+						 </script>
+                    </li>
+                    <li style="width:45%;float:left;">
+                    	<div class="charenshao">
+                        <center>	<div class="yzd_one png" onmouseover="this.className='yzd_one_onmouse'"
+                            onmouseout="this.className='yzd_one'" onmousedown="RM.ptz.callpreset()"
+                            onmouseup="RM.ptz.stop()" title="Вызов"></div></center>
+                        </div>
+                    </li>
+                </ul>
+                <ul style="width:100%;height:10px;_height:0px;*height:10px;"></ul>
+                
+                <ul style="height:18px;line-height:20px;_line-height:18px;">
+                	<b style="color:#FFF; position:absolute;left:10px;top:5xp;color:#BCBCBC;" id="ptz_curseline_text"><font>Маршрут</font></b>
+                    
+                </ul>
+                
+                <ul style="height:20px;line-height:20px;">
+                	<li style="width:50%; float:left;" >
+                    <div id="yuzhid_2" style="position:absolute;left:10px; z-index:9977; text-align:left; "></div>
+                    <script>
+					var yz=[];
+					for(var i=0;i<4;i++){
+						yz[i]={value:i,text:'Маршрут'+(i+1)+''}
+					}
+					
+					var brate = new rspDropbox("yuzd2", "yuzd2", yz, "/HAPPLE/images/rspPlaybackdrop_bg.gif?"+ RM.SYS.custName, 115, 22, 23);
+                        jQuery("#yuzhid_2").html(brate.getHtml());
+						 </script>
+                    </li>
+                    <li style="width:45%;float:right;height:25px;line-height:25px;text-align:left;">
+                    	<div class="xh_enable"><center>
+                        	<div class="yzd_two png" onmouseover="this.className='yzd_two_onmouse'"
+                            onmouseout="this.className='yzd_two'"
+                            onmousedown="cruiseSet_start(1)" title="Старт"></div></center>
+                        </div>
+                        <div class="yzd_three_big">
+                        <center>
+                        	<div class="yzd_three png" onmouseover="this.className='yzd_three_onmouse'"
+                            onmouseout="this.className='yzd_three'"
+                            onmousedown="cruiseSet_start(2)" title="Стоп"></div></center>
+                        </div>
+                    </li>
+                </ul>
+             </div>
+             
+            <div class="content_contentdown">
+              
+            </div>
+        </div>
+        <div class="content_left_contet">
+        
+        </div>
+
+        <div class="left_bottom_bottom" >
+        <div class="imagesbotton_4_bottom png" id="bottom_voidSet" >
+        	<label style="color:#BCBCBC; position:absolute;left:50px;top:11px"><b>Цвет</b></label>
+        </div>
+
+            <div class="bottom_contentdown" id="diabledBydisplay">
+
+                    
+                
+                    
+                  <div class="content_left_content_1">
+                    <img src="/HAPPLE/pages/images/LUM_liangdu.png"  class="this png" style=" margin-top:7px;" alt="" title="Яркость"  onclick="ImageSetting('AVSM_VIP_[CH]_LUM','volDrag2','LUM_liangdu')"/>
+                    <div class="content_left_content_1_bgImage1 png" id="AVSM_VIP_[CH]_LUM" name="param" onclick="GetPostion(event,'volDrag2',2)" style="*text-align:left;margin-right:10px;">
+                        <div class="content_left_content_1_remove png" id="volDrag2" onmousedown="remoceGetxy(this)" ></div>
+                    </div>
+                </div>
+					  <!-- <input type="text" id="LUM_liangdu" style="height:20px; width:15px;_width:15px; line-height:20px; border:0px; background-color:#23272C; float:right; margin-top:-29px;margin-right:-10px;_position:absolute;_left:185px;" disabled="true" value="33" />--><label id="LUM_liangdu" style="height:20px; width:15px;_width:15px; line-height:20px;float:right; margin-top:-29px;margin-right:-10px;_position:absolute;_left:185px;color:#FFF"><font>33</font></label>
+                    
+                     <div class="content_left_content_1">
+                    <img src="/HAPPLE/pages/images/CONT_duibidu.png" class="this png" style=" margin-top:7px" alt="" title="Контрастность" onclick="ImageSetting('AVSM_VIP_[CH]_CONT','Div16','CONT_duibidu')"/>
+                    <div class="content_left_content_1_bgImage1 png" id="AVSM_VIP_[CH]_CONT" name="param" style="*text-align:left;_margin-top:15px;margin-right:10px;" onclick="GetPostion(event,'Div16',2)">
+                        <div class="content_left_content_1_remove png" id="Div16" onmousedown="remoceGetxy(this)"></div>
+                    </div>
+                   
+                </div>
+                <!-- <input id="CONT_duibidu" style="height:20px; width:15px; line-height:20px; border:0px; background-color:#23272C; color:#FFF; float:right; margin-top:-29px;margin-right:-10px;_position:absolute;_left:185px;" disabled="true" value="33" />-->
+                   <label id="CONT_duibidu" style="height:20px; width:15px; line-height:20px;color:#FFF; float:right; margin-top:-29px;margin-right:-10px;_position:absolute;_left:185px;"><font>33</font></label>
+                <div class="content_left_content_1">
+                    <img src="/HAPPLE/pages/images/SAT_baohedu.png" class="this png" style=" margin-top:7px" alt="" title="Тон" onclick="ImageSetting('AVSM_VIP_[CH]_CRM','Div14','SAT_baohedu')"/>
+                    <div class="content_left_content_1_bgImage1 png" style="*text-align:left;_margin-top:15px;margin-right:10px;" id="AVSM_VIP_[CH]_CRM" name="param" onclick="GetPostion(event,'Div14',2)">
+                        <div class="content_left_content_1_remove png" id="Div14" onmousedown="remoceGetxy(this)"></div>
+                    </div>
+                </div>
+				   <!--<input id="SAT_baohedu" style="height:20px; width:15px; line-height:20px; border:0px; background-color:#23272C; color:#FFF; float:right; margin-top:-29px;margin-right:-10px;_position:absolute;_left:185px;" disabled="true" value="33" />-->
+                
+               <label id="SAT_baohedu" style="height:20px; width:15px; line-height:20px;color:#FFF; float:right; margin-top:-29px;margin-right:-10px;_position:absolute;_left:185px;"><font>33</font></label>
+               
+               <div class="content_left_content_1">
+                    <img src="/HAPPLE/pages/images/CRM_sedu.png" class="this png" style=" margin-top:7px" alt="" title="Насыщенность" onclick="ImageSetting('AVSM_VIP_[CH]_SAT','Div12','CRM_sedu')"/>
+                    <div class="content_left_content_1_bgImage1 png" id="AVSM_VIP_[CH]_SAT" name="param" onclick="GetPostion(event,'Div12',2)" style="*text-align:left;margin-right:10px;">
+                        <div class="content_left_content_1_remove png" id="Div12" onmousedown="remoceGetxy(this)"></div>
+                    </div>
+                </div>
+  	               <!-- <input id="CRM_sedu" style="height:20px; width:15px; line-height:20px; border:0px; background-color:#23272C; color:#FFF; float:right; margin-top:-29px; margin-right:-10px;_position:absolute;_left:185px;" disabled="true" value="33" />-->
+                   <label id="CRM_sedu" style="height:20px; width:15px; line-height:20px;color:#FFF; float:right; margin-top:-29px; margin-right:-10px;_position:absolute;_left:185px;"><font>33</font></label>
+            </div>
+        </div>
+    </div>
+    <div class="left_hideOrshow">
+        <img src="/HAPPLE/pages/images/hideOrshowLeft.bmp" alt="" id="imageremoves" style="width:6px; height:100px;"/>
+    </div>
+</div>
+
+<div id="view_ocx" style=" float:left; text-align:center; color:White; background-color:Black;">&nbsp;
+</div>
+
+<div id="view_playctl" class="playback_conten_right1" >
+    <ul style=" text-align:center;padding-top:20px;">
+    	<li style="float:left; margin-left:10px">
+    		<div class="content_right_bottom_image_1 png"  id="phone" value="false" 						        
+               onmouseover="this.className='content_right_bottom_image_onmouse_1'"
+               onmouseout="this.className='content_right_bottom_image_1'"
+               onmousedown="this.className='content_right_bottom_image_down_1'"
+               onmouseup="this.className='content_right_bottom_image_onmouse_1'"
+              onclick="g_device.snap();" title="Захват">
+          </div>
+   	    </li>
+        
+        <li style="float:left;margin-left:10px">
+    		 <div class="content_right_bottom_image_2 png" id="Fullscreen" value="false"  
+     onmouseover="if($('#Fullscreen').attr('value')=='true'){this.className='content_right_bottom_image_onmouse_2_1'}
+     else{this.className='content_right_bottom_image_onmouse_2'}" 
+     onmouseout="if($('#Fullscreen').attr('value')=='true'){this.className='content_right_bottom_image_down_2'}
+     else{this.className='content_right_bottom_image_2'}"
+     onmousedown="setFullscreen('Fullscreen',$('#Fullscreen').attr('value'));" 
+     onmouseup="if($('#Fullscreen').attr('value')=='true'){this.className='content_right_bottom_image_down_2'}
+     else{this.className='content_right_bottom_image_2'}" title="Старт/Стоп запись">
+        </div>
+   	    </li>
+        
+         <li style="float:left;margin-left:10px;" id="duijiang">
+    		 <div class="content_right_bottom_image_talkback png" id="Talkback" value="false"  
+     onmouseover="if($('#Talkback').attr('value')=='true'){this.className='content_right_bottom_image_talkback_onmouse_2'}
+     else{this.className='content_right_bottom_image_talkback_onmouse'}" 
+     onmouseout="if($('#Talkback').attr('value')=='true'){this.className='content_right_bottom_image_talkback_onmouse_down'}
+     else{this.className='content_right_bottom_image_talkback'}"
+     onmousedown="setTalkback('Talkback',$('#Talkback').attr('value'));" 
+     onmouseup="if($('#Talkback').attr('value')=='true'){this.className='content_right_bottom_image_talkback_onmouse_down'}
+     else{this.className='content_right_bottom_image_talkback'}" title="Разговор">
+        </div>
+   	    </li>
+        
+        <li style="float:left;margin-left:10px">
+    		 <div class="content_right_bottom_image_13 png"  id="startOrStopview" value="false"
+        onmouseover="if($('#startOrStopview').attr('value')=='true'){this.className='content_right_bottom_image_onmouse_13_1'}
+           else{this.className='content_right_bottom_image_onmouse_13'}"
+           onmouseout="if($('#startOrStopview').attr('value')=='true'){this.className='content_right_bottom_image_down_13'}
+           else{this.className='content_right_bottom_image_13'}"
+           onmousedown="this.className='content_right_bottom_image_down_13'"
+           onmouseup="this.className='content_right_bottom_image_onmouse_13'" title="Откр/Закр окно" onclick="startOrStopviews(this.id,$('#startOrStopview').attr('value'))">
+         </div>
+   	    </li>
+        
+        <li style="float:left;margin-left:10px">
+    		 <div class="content_right_bottom_image_14 png"  id="reviewDig" value="false"
+        onmouseover="if($('#reviewDig').attr('value')=='true'){this.className='content_right_bottom_image_onmouse_14_1'}
+           else{this.className='content_right_bottom_image_onmouse_14'}"
+           onmouseout="if($('#reviewDig').attr('value')=='true'){this.className='content_right_bottom_image_down_14'}
+           else{this.className='content_right_bottom_image_14'}"
+           onmousedown="this.className='content_right_bottom_image_down_14'"
+           onmouseup="this.className='content_right_bottom_image_onmouse_14'" title="Цифровое увеличение" onclick="reviewDig_click(this.id,$('#reviewDig').attr('value'))">
+         </div>
+   	    </li>
+        
+         <li style="float:left;margin-left:10px">
+    		 <div class="content_right_bottom_image_4 png"  id="MainStream"  value="false" 
+          onmouseover="if(this.value=='true'){this.className='content_right_bottom_image_onmouse_4_1'}
+           else{this.className='content_right_bottom_image_onmouse_4'}" 
+        onmouseout="if(this.value=='true'){this.className='content_right_bottom_image_down_4'}
+           else{this.className='content_right_bottom_image_4'}" 
+        onmousedown="MainStream_over_down('MainStream',document.getElementById(this.id).getAttribute('cv'))" cv='1' 
+        onmouseup="if(this.value=='true'){this.className='content_right_bottom_image_down_4'}
+           else{this.className='content_right_bottom_image_4'}"
+        title="Осн.поток">
+        </div>
+   	    </li>
+        
+         <li style="float:left;margin-left:10px">
+    		 <div class="content_right_bottom_image_5 png"  id="SonStream"  value="false" cv="0" 
+          onmouseover="if(this.value=='true'){this.className='content_right_bottom_image_onmouse_5_1'}
+           else{this.className='content_right_bottom_image_onmouse_5'}" 
+        onmouseout="if(this.value=='true'){this.className='content_right_bottom_image_down_5'}
+           else{this.className='content_right_bottom_image_5'}" 
+        onmousedown="SonStream_down('SonStream',document.getElementById(this.id).getAttribute('cv'))" 
+         onmouseup="if(this.value=='true'){this.className='content_right_bottom_image_down_5'}
+           else{this.className='content_right_bottom_image_5'}"
+         title="Сетевой поток">
+        </div>
+   	    </li>
+        
+         <script type="text/javascript">
+		 if(RM.SYS.talkback != "true")
+		 {
+			document.getElementById("duijiang").style.display="none";
+		 }
+		
+		if(RM.SYS.priwe == "true")
+		{
+			document.getElementById("startOrStopview").value="true";
+			document.getElementById("startOrStopview").className="content_right_bottom_image_down_13 png";
+			setTimeout(function(){$("#MainStream").removeAttr("disabled");
+			$("#SonStream").removeAttr("disabled");},2000);
+		}
+		else
+		{
+			document.getElementById("startOrStopview").value="false";
+			document.getElementById("startOrStopview").className="content_right_bottom_image_13 png";
+			setTimeout(function(){document.getElementById("MainStream").disabled=true;
+			document.getElementById("SonStream").disabled=true;},2000);
+		}
+			
+		if(RM.SYS.product_type.split("_")[0]=="9204XH" || RM.SYS.product_type.split("_")[0]=="9204XD" || RM.SYS.product_type.split("_")[0]=="9208XH")
+		{
+			$(".left_bottom_bottom").hide();
+		}
+		
+			function MainStream_over_down(id,cv_value){
+					document.getElementById("SonStream").className="content_right_bottom_image_5";
+					document.getElementById("SonStream").value="false";
+					document.getElementById("MainStream").className="content_right_bottom_image_down_4";
+					document.getElementById("MainStream").value="true";
+					document.getElementById('dvrplug').SwitchPreviewStreamType(RM.frame.getDevice().gethandle(),1);
+					
+					rsp_setCookie("EncodingVlaue",1);
+			}
+			
+			function SonStream_down(id,cv_value){  //开启子码流
+					document.getElementById("MainStream").className="content_right_bottom_image_4";	
+					document.getElementById("MainStream").value="false";
+					
+					document.getElementById("SonStream").className="content_right_bottom_image_down_5";
+					document.getElementById("SonStream").value="true";
+					document.getElementById('dvrplug').SwitchPreviewStreamType(RM.frame.getDevice().gethandle(),0);
+					rsp_setCookie("EncodingVlaue",0);
+			}
+				
+			function setFullscreen(id,value){
+				value=$("#"+id+"").attr("value");
+				var closeOral=$("#startOrStopview").attr("value");
+				if(value=="false"&&closeOral=="true"){
+					
+					document.getElementById("dvrplug").StartRecord(RM.frame.getDevice().gethandle(),0,0);
+					document.getElementById(id).value="true";
+					rsp_setCookie("scren","true");
+				}
+				else
+				{
+					document.getElementById("dvrplug").StopRecord(RM.frame.getDevice().gethandle(),0);
+					document.getElementById(id).value="false";
+					rsp_setCookie("scren","false");
+				}
+
+			}
+			
+			function setTalkback(id,value){
+				value=$("#"+id+"").attr("value");
+				//var closeOral=$("#startOrStopview").attr("value");
+				if(value=="false"){
+					document.getElementById(id).disabled = true;
+					var callbackValue = document.getElementById("dvrplug").Talk(RM.frame.getDevice().gethandle(),1);
+					if(callbackValue == 0)
+					{
+						document.getElementById(id).disabled = false;
+						document.getElementById(id).value="true";
+					}
+					else
+					{
+						if(callbackValue == 6)
+						{
+							alert(RM.language.IE_DEV_OFFLINE);
+						}
+						else if(callbackValue == 67)
+						{
+							alert(RM.language.IE_TALK_AUDIO_ENCODE_FALED);
+						}
+						else if(callbackValue == 67)
+						{
+							alert(RM.language.IE_TALK_AUDIO_DECODE_FALED);
+						}
+						else if(callbackValue == 69)
+						{
+							alert(RM.language.IE_TALK_START_FALED);
+						}
+						
+						document.getElementById(id).disabled = false;
+					}
+				}
+				else
+				{
+					document.getElementById(id).disabled = true;
+					var callbackValue = document.getElementById("dvrplug").Talk(RM.frame.getDevice().gethandle(),0);
+					if(callbackValue == 0)
+					{
+						document.getElementById(id).disabled = false;
+						document.getElementById(id).value="false";
+					}
+					else
+					{
+						if(callbackValue == 6)
+						{
+							alert(RM.language.IE_DEV_OFFLINE);
+						}
+						else if(callbackValue == 67)
+						{
+							alert(RM.language.IE_TALK_AUDIO_ENCODE_FALED);
+						}
+						else if(callbackValue == 67)
+						{
+							alert(RM.language.IE_TALK_AUDIO_DECODE_FALED);
+						}
+						else if(callbackValue == 69)
+						{
+							alert(RM.language.IE_TALK_START_FALED);
+						}
+						document.getElementById(id).disabled = false;
+					}
+				}
+
+			}
+			
+			function startOrStopviews(id,value){
+				if(value=="true") {
+						rsp_setCookie("startOrStop","false");
+			            RM.frame.getDevice().stopPreviewAll();
+						$("#"+id+"").attr("class","content_right_bottom_image_13");
+						$("#"+id+"").attr("value","false");
+						document.getElementById("dvrplug").StopRecord(RM.frame.getDevice().gethandle(),0);
+						document.getElementById("Fullscreen").className="content_right_bottom_image_2";
+						document.getElementById("Fullscreen").value="false";
+						document.getElementById("MainStream").disabled=true;
+						document.getElementById("SonStream").disabled=true;
+						
+						rsp_setCookie("scren","false");
+						
+				}else{
+					rsp_setCookie("startOrStop","true");
+					var streaming=rsp_getCookie("EncodingVlaue");
+					if (streaming == '') { streaming = 0; };
+					RM.frame.getDevice().startAllPreview(parseInt(streaming));
+					$("#"+id+"").attr("class","content_right_bottom_image_down_13");
+					$("#"+id+"").attr("value","true");
+					document.getElementById("MainStream").disabled=false;
+					document.getElementById("SonStream").disabled=false;
+					
+					//document.getElementById("dvrplug").StartRecord(RM.frame.getDevice().gethandle(),0,0);
+					//document.getElementById(id).value="true";
+					//rsp_setCookie("scren","true");
+				}
+			}
+			
+			function reviewDig_click(id,value)
+			{
+				if(value=="true") {
+					$("#"+id+"").attr("class","content_right_bottom_image_14");
+					$("#"+id+"").attr("value","false");
+					document.getElementById("dvrplug").PreviewDigitalRoomControl(RM.frame.getDevice().gethandle(),0);
+				}
+				else
+				{
+					$("#"+id+"").attr("class","content_right_bottom_image_down_14");
+					$("#"+id+"").attr("value","true");
+					document.getElementById("dvrplug").PreviewDigitalRoomControl(RM.frame.getDevice().gethandle(),1);
+				}
+			}
+        </script>
+
+        
+         <li style="float:left;margin-left:10px; margin-top:2px;">
+    		 <div class="content_right_bottom_image_6 png" id="yinL" value="false" onmouseover="ChangeViewBtnBg(0,'yinL','content_right_bottom_image_onmouse_6')" 
+        onmouseout="ChangeViewBtnBg(1,'yinL','content_right_bottom_image_6')"  onclick="VolumSet()" 
+         title="Выкл. звук">
+        </div>
+   	    </li>
+        	<script>
+			//rsp_setCookie("volume",jQuery("#yinL").attr("class"));
+			if(volume!=0){
+			if(rsp_getCookie("volume")==""){rsp_setCookie("volume",jQuery("#yinL").attr("class").split(' ')[0]);};
+			document.getElementById("yinL").className=rsp_getCookie("volume");
+			document.getElementById("yinL").value="true";index_windowTure++;
+			}else{volume++;}
+			
+			function VolumSet(){
+				if(rsp_getCookie("vol")=="false"){
+					$("#yinL").attr("value","false");
+					document.getElementById("dvrplug").SetPreviewSoundState(RM.frame.getDevice().gethandle(),1);
+					rsp_setCookie("vol","true");
+					rsp_setCookie("volume","content_right_bottom_image_6");
+					$("#yinL").attr("class","content_right_bottom_image_6");
+				}else{
+					$("#yinL").attr("value","true");
+					document.getElementById("dvrplug").SetPreviewSoundState(RM.frame.getDevice().gethandle(),0);
+					rsp_setCookie("vol","false");
+					rsp_setCookie("volume","content_right_bottom_image_down_6");
+					$("#yinL").attr("class","content_right_bottom_image_down_6");
+				}
+			}
+			function setPreviewValue(id){
+				var bol;
+				if( RM.SYS.custName == "CUSTOMER_NIGHTOWL" || RM.SYS.custName == "CUSTOMER_QSEE" )
+				{
+					bol = document.getElementById(id).value;
+				}
+				else
+				{
+					 bol=rsp_getCookie("maxbol");
+				}
+				if (bol == "false")
+				{
+					document.getElementById(id).value="true";
+					document.getElementById(id).className="content_right_bottom_image_onmouse_18_1";
+				
+					if( RM.SYS.custName == "CUSTOMER_NIGHTOWL" || RM.SYS.custName == "CUSTOMER_QSEE" )
+					{
+						document.getElementById("dvrplug").SetPreviewVideoShapeMode(1);
+					}
+					else
+					{
+						rsp_setCookie("maxbol","true");
+						document.getElementById("dvrplug").SetPlayBackWindowShapeState(RM.frame.getDevice().gethandle(),1,0);
+					}
+				}
+				else
+				{
+					document.getElementById(id).value="false";
+					document.getElementById(id).className="content_right_bottom_image_onmouse_18";
+					
+					if( RM.SYS.custName == "CUSTOMER_NIGHTOWL" || RM.SYS.custName == "CUSTOMER_QSEE" )
+					{
+						document.getElementById("dvrplug").SetPreviewVideoShapeMode(0);
+					}
+					else
+					{
+						rsp_setCookie("maxbol","false");
+						document.getElementById("dvrplug").SetPlayBackWindowShapeState(RM.frame.getDevice().gethandle(),1,1);
+					}
+				}
+				if( RM.SYS.custName != "CUSTOMER_NIGHTOWL" && RM.SYS.custName != "CUSTOMER_QSEE" )
+				{
+					resizeViewWindow();
+					RM.frame.changeUrl("liveView.rsp",1);
+				}
+			}
+		</script>
+        
+        	 <li style="float:left;margin-left:10px;">
+    		<div class="content_right_bottom_YL png" id="Div17div"  onclick="GetPostion_YL(event,'Div17')" >
+            <div class="content_right_bottom_YL_remove png" id="Div17"  onmousedown="remoceGetxy(this)" style="margin-left:50px"></div>
+        </div>
+   	    </li>
+        
+    </ul>
+    
+        <div class="content_right_bottom_tongdao">
+   		
+	 <div class="content_right_bottom_image_10  png"  id="fivePreview"  style="margin-left:10px;" value="false"
+        onmouseover="ChangeViewBtnBg(0,'fivePreview','content_right_bottom_image_onmouse_10')"  
+        onmouseout="ChangeViewBtnBg(1,'fivePreview','content_right_bottom_image_10')" 
+        onclick="javascript: if( document.getElementById('dvrplug') != null)
+	{ document.getElementById('dvrplug').NextGroupVideos();}" title="След. страница">
+        </div>
+     
+    
+        
+        <div class="content_right_bottom_image_11  png"  id="sixPreview"  style="margin-left:10px;" value="false"
+        onmouseover="ChangeViewBtnBg(0,'sixPreview','content_right_bottom_image_onmouse_11')"  
+        onmouseout="ChangeViewBtnBg(1,'sixPreview','content_right_bottom_image_11')" 
+         onclick="javascript: if( document.getElementById('dvrplug') != null)
+		{ document.getElementById('dvrplug').PreviousGoupVides();}" title="Пред. страница">
+        </div>
+        
+         <div class="content_right_bottom_image_32  png"  id="treettingPreview"  style="margin-left:10px;" value="false"
+        onmouseover="ChangeViewBtnBg(0,'treettingPreview','content_right_bottom_image_onmouse_32')"  
+        onmouseout="ChangeViewBtnBg(1,'treettingPreview','content_right_bottom_image_32')" 
+        onclick="javascript: if( document.getElementById('dvrplug') != null)
+		{document.getElementById('dvrplug').ShowChannels(32);}" title="32 экрана">
+        </div>
+        
+		 <div class="content_right_bottom_image_16  png"  id="sixttingPreview"  style="margin-left:10px;" value="false"
+        onmouseover="ChangeViewBtnBg(0,'sixttingPreview','content_right_bottom_image_onmouse_16')"  
+        onmouseout="ChangeViewBtnBg(1,'sixttingPreview','content_right_bottom_image_16')" 
+        onclick="javascript: if( document.getElementById('dvrplug') != null)
+		{document.getElementById('dvrplug').ShowChannels(16);}" title="16 экранов">
+        </div>
+        <script type="text/jscript">
+             if (RM.SYS.MAX_CHL_NUM <16) {
+                 document.getElementById("sixttingPreview").style.display = "none";
+             }
+			 if( RM.SYS.MAX_CHL_NUM < 32 )
+			 {
+			 	document.getElementById("treettingPreview").style.display = "none";
+			 }
+         </script>
+        
+        <div class="content_right_bottom_image_12  png"  id="ninePreview"  style="margin-left:10px;" value="false"
+        onmouseover="ChangeViewBtnBg(0,'ninePreview','content_right_bottom_image_onmouse_12')"  
+        onmouseout="ChangeViewBtnBg(1,'ninePreview','content_right_bottom_image_12')" 
+        onclick="javascript: if( document.getElementById('dvrplug') != null)
+		{document.getElementById('dvrplug').ShowChannels(9);}" title="9 каналов">
+        </div>
+        
+         <script type="text/jscript">
+             if (RM.SYS.MAX_CHL_NUM <4) {
+                 document.getElementById("ninePreview").style.display = "none";
+             }
+         </script>
+          <div class="content_right_bottom_image_9  png"  id="fourPreview"  style="margin-left:10px;" value="false"
+        onmouseover="ChangeViewBtnBg(0,'fourPreview','content_right_bottom_image_onmouse_9')"  
+        onmouseout="ChangeViewBtnBg(1,'fourPreview','content_right_bottom_image_9')" 
+        onclick="javascript: if( document.getElementById('dvrplug') != null)
+		{document.getElementById('dvrplug').ShowChannels(4);}" title="4 канала">
+        </div>
+        
+        <div class="content_right_bottom_image_7  png"  id="btnPreview"  style="margin-left:10px;" value="false"
+        onmouseover="javascript:ChangeViewBtnBg(0,'btnPreview','content_right_bottom_image_onmouse_7')"  
+        onmouseout="ChangeViewBtnBg(1,'btnPreview','content_right_bottom_image_7')" 
+         onclick="setVideoCount(0);" title="Полный экран">
+        </div>
+       
+        
+   <div class="content_right_bottom_image_18  png"  id="setPreview" style="margin-left:10px;" value="false"
+        onmouseover="if(this.value=='true'){this.className='content_right_bottom_image_onmouse_18_1'}
+           else{this.className='content_right_bottom_image_onmouse_18'}" 
+        onmouseout="if(this.value=='true'){this.className='content_right_bottom_image_down_18'}
+           else{this.className='content_right_bottom_image_18'}" 
+         onclick="setPreviewValue(this.id)" title="Оригинал/В полном окне">
+        </div>
+    </div>
+ 
+</div>
+
+
+<script type="text/javascript">
+	if(RM.SYS.MAX_CHL_NUM==1){
+			document.getElementById('content_left').style.display="none";
+			document.getElementById('fourPreview').style.display="none";
+			document.getElementById('ninePreview').style.display="none";
+			document.getElementById('sixPreview').style.display="none";
+			document.getElementById('fivePreview').style.display="none";
+			document.getElementById('sixttingPreview').style.display="none";
+		}
+		
+		
+</script>  
+</div>
+<div id="content_body_border_playback" style="display:none">
+<script type="text/javascript" src="/HAPPLE/js/userControl/rspPlaybackCalendar.js?v192"></script>
+<script type="text/javascript" src="/HAPPLE/js/userControl/rspPlaybackList.js?v192"></script>
+<div class="playback-content-border" id="playback-content-border">
+	<div  id="playback_opt">
+	    <div class="playback-calendar-border">
+	        <div class="playback-calendar-header">
+	            <div id="calendar_month_border" style="position:absolute; z-index:9999;"></div>
+	            <div id="calendar_year_border" style="position:absolute; z-index:9999;"></div>
+	            <script type="text/javascript">
+	                var months = [{ value: 1, text: "Янв." }, { value: 2, text: "Фев." }, { value: 3, text: "Мар." }, { value: 4, text: "Апр." }, { value: 5, text: "Май" }, { value: 6, text: "Июн." }, { value: 7, text: "Июл." }, { value: 8, text: "Авг." }, { value: 9, text: "Сен." }, { value: 10, text: "Окт." }, { value: 11, text: "Ноя." }, { value: 12, text: "Дек."}];
+	                var monthdrop = new rspDropbox("calendar_month", "calendar_month", months, "/HAPPLE/images/rspPlaybackdrop_bg.gif?" + RM.SYS.custName, 60, 22, 19, "onChangeCalendarDate()",6);
+	                jQuery("#calendar_month_border").html(monthdrop.getHtml()+monthdrop.getStyle());
+	                monthdrop.setJson(new Date().getMonth() + 1);
+                    
+	                var years = [];
+	                var nowYear = new Date().getFullYear();
+	                for (var i = -10; i < 29; i++) {
+	                    years[years.length] = { value: nowYear - 2 + i, text: nowYear - 2 + i };
+	                }
+	                var yeardrop = new rspDropbox("calendar_year", "calendar_year", years, "/HAPPLE/images/rspPlaybackdrop_bg.gif?" + RM.SYS.custName, 60, 22, 19, "onChangeCalendarDate()", 6);
+	                jQuery("#calendar_year_border").html(yeardrop.getHtml());
+	                yeardrop.setJson(nowYear);
+	                
+	            </script>
+	        </div>
+	        <div class="playback-calendar-content">
+	        
+	        </div>
+	    </div>
+	    <script type="text/javascript">
+	        var calendar = new rspPlaybackCalendar({ id: "playbackCalendar", year: 2012, month: 2, Mo: "Пн", Tu: "Вт", We: "Ср", Th: "Чт", Fr: "Пт", Sa: "Сб", Su: "Вс", monthchangedfun: "", daychangedfun: "", bgimg: "HAPPLE/images/playbackcalendarbg.jpg?" + RM.SYS.custName });
+	        jQuery(".playback-calendar-content").html(calendar.getHtml());
+	        calendar.changeDate(2012, 1);
+	        calendar.setonclickfun("onGetRecordPeriod();");
+	    </script>
+	    <div class="playback_search_border">
+	        <div class="playback_search_head">&nbsp;
+	        </div>
+          
+	        <div class="playback_search_content">
+                <ul class="playback-search-opt" style="margin-left:10px;">
+                    <li id="playback_channel_border" class="playback-search-opt-chtitle" style="width:190px;">
+                       
+                        <script>
+						if(RM.SYS.MAX_CHL_NUM == 32)
+						{
+							$(".playback-search-opt-chtitle").css("height","142px");
+						}
+						  var html="";
+
+						  var checkeCount=0;
+						  html+=" <label id='playback_channel_label' style='width:43px;height:14px;'>Канал:</label>";
+						   	 for(var i=0;i<RM.SYS.MAX_CHL_NUM;i++){
+								 if( (i==0 || i==4 || i==8 || i== 12 || i== 16 || i== 20 || i== 24 || i== 28 || i== 32))
+									{
+										if( i != 0 )
+										{	if(RM.SYS.product_type.split("_")[0]=="7116XE" || RM.SYS.product_type.split("_")[0]=="7116XC" || RM.SYS.product_type == "8632XH_VA"|| RM.SYS.product_type == "8832XH_VA"|| RM.SYS.product_type == "9208XH_VA"|| RM.SYS.MAX_CHL_NUM == 32){
+												html+="<font style='width:43px;'></font><input type='checkbox' name='all' disabled='true' id='checkedall_"+i+"' onclick='checkedCHl("+i+");selectMaxForBy7116(this.id)'/><font style='width:10px;'></font>";
+											}else{
+												html+="<font style='width:43px;'></font><input type='checkbox' name='all' checked='checked' id='checkedall_"+i+"' onclick='checkedCHl("+i+");selectMaxForBy7116(this.id)'/><font style='width:10px;'></font>";
+												}
+										}
+										else
+										{
+											html+="<input type='checkbox' name='all' checked='checked' id='checkedall_"+i+"' onclick='checkedCHl("+i+");selectMaxForBy7116(this.id)'/><font style='width:10px;'> </font>";
+										}
+										
+									}
+									else
+									{
+										if(i==0 || i==4 || i==8 || i== 12 || i== 16 || i== 20 || i== 24 || i== 28 || i== 32)
+										{
+											if(i>=4)
+											{
+												html+="<font style='width:66px;'> </font>";
+											}
+											else
+											{
+												html+="<font style='width:24px;'> </font>";
+											}
+										}
+										
+									}
+								if(RM.SYS.product_type.split("_")[0]=="7116XE" || RM.SYS.product_type.split("_")[0]=="7116XC" || RM.SYS.product_type == "8632XH_VA"|| RM.SYS.product_type == "8832XH_VA"|| RM.SYS.product_type == "9208XH_VA"|| RM.SYS.MAX_CHL_NUM == 32)
+								{
+									if(i<4){
+									html+="<input type='checkbox' id='playback_sel_ch"+i+"' checked='checked' onclick='isAllChecked("+i+");checked_7116XE("+i+");selectMaxForBy7116(\"playback_sel_ch"+i+"\");'/><font>"+(parseInt(i)+1)+"</font>";
+									}else{
+									 html+="<input type='checkbox' disabled='true' id='playback_sel_ch"+i+"' onclick='isAllChecked("+i+");checked_7116XE("+i+");selectMaxForBy7116(\"playback_sel_ch"+i+"\");'/><font>"+(parseInt(i)+1)+"</font>";
+									}
+								}else{
+									html+="<input type='checkbox' id='playback_sel_ch"+i+"' checked='checked' onclick='selectMaxForBy7116(\"playback_sel_ch"+i+"\");isAllChecked("+i+");'/><font>"+(parseInt(i)+1)+"</font>";
+								}
+							  }
+						  $("#playback_channel_border").html(html); 
+						  
+						  
+						  function selectMaxForBy7116(id){
+							    checkeCount=0;
+								if(RM.SYS.product_type.split("_")[0]=="7116XE" || RM.SYS.product_type.split("_")[0]=="7116XC" || RM.SYS.product_type == "8632XH_VA"|| RM.SYS.product_type == "8832XH_VA"|| RM.SYS.product_type == "9208XH_VA"|| RM.SYS.MAX_CHL_NUM == 32){
+									var chex = $("#playback_channel_border input[type='checkbox']");
+									for(var i=0;i<chex.length;i++){
+										if(chex[i].checked ){
+											if(chex[i].name != 'all')
+											{
+												checkeCount++;
+											}
+										}
+									}
+									if(checkeCount >= 4){
+										if(checkeCount>4){
+											document.getElementById(id).checked=false;	
+											if( document.getElementById(id).name == 'all')
+											{
+												var arr = id.split("_");
+												checkedCHl(parseInt(arr[1]));
+												return;
+											}
+										}
+										var chebx = $("#playback_channel_border input[type='checkbox']");
+										for(var i=0;i<chebx.length;i++){
+											if(!(chebx[i].checked)){
+												chebx[i].disabled = true;
+											}
+										}
+									}else{
+										var chebx = $("#playback_channel_border input[type='checkbox']");
+										for(var i=0;i<chebx.length;i++){
+											if(!(chebx[i].checked)){
+												chebx[i].disabled = false;
+											}
+										}
+									}
+								}
+						  }
+						  var count=0;
+						  var flag = 0;
+						  var maxNum = 0;
+						  var tcount=0;
+						  var tflag = 0;
+						  var tmaxNum = 0;
+						  var allFlag = 0;
+						  var gFlag = 3;
+						  function isAllChecked(num){
+								if((num<=3) || (num > 3 && num <=7) || (num>7 && num <= 11) || (num >11 && num <= 15) || (num>15 && num <= 19) || (num>19 && num <= 23) || (num>23 && num <= 27) || num > 27){
+									count = 0;
+									if(num <= 3){
+										maxNum = 3;
+										flag = 0;
+									}else if(num > 3 && num <= 7){
+										flag = 4;
+										maxNum = 7;
+									}else if(num > 7 && num <= 11){
+										flag = 8;
+										maxNum = 11;
+									}else if(num > 11 && num <= 15){
+										flag = 12;
+										maxNum = 15;
+									}else if(num > 15 && num <= 19){
+										flag = 16;
+										maxNum = 19;
+									}else if(num > 19 && num <= 23){
+										flag = 20;
+										maxNum = 23;
+									}else if(num > 23 && num <= 27){
+										flag = 24;
+										maxNum = 27;
+									}else if(num > 27){
+										flag = 28;
+										maxNum = 31;
+									}else{
+									}
+								}
+								for( var i=flag; i<=maxNum;i++){
+									if(document.getElementById("playback_sel_ch"+i+"").checked){
+										count++;
+									}else{
+									}
+								}
+								if(count != 0 && count%4 == 0){
+										document.getElementById("checkedall_"+flag+"").checked = true;
+									}else{
+										document.getElementById("checkedall_"+flag+"").checked = false;
+									}
+						  }
+
+						var dcout = 0 ;
+						function checked_7116XE(num){
+							dcout = tcount;
+							if((num<=3) || (num>3 && num<=7) || (num>7 && num<=11) || (num>11 && num<=15) || (num>15 && num<=19) || (num>19 && num<=23) || (num>23 && num<=27) || num>27){
+									tcount = 0;
+									if(num <= 3){
+										tmaxNum = 3;
+										tflag = 0;
+									}else if(num > 3 && num <= 7){
+										tflag = 4;
+										tmaxNum = 7;
+									}else if(num > 7 && num <= 11){
+										tflag = 8;
+										tmaxNum = 11;
+									}else if(num > 11 && num <= 15){
+										tflag = 12;
+										tmaxNum = 15;
+									}else if(num > 15 && num <= 19){
+										tflag = 16;
+										tmaxNum = 19;
+									}else if(num > 19 && num <= 23){
+										tflag = 20;
+										tmaxNum = 23;
+									}else if(num > 23 && num <= 27){
+										tflag = 24;
+										tmaxNum = 27;
+									}else if(num > 27){
+										tflag = 28;
+										tmaxNum = 31;
+									}else{
+									}
+								}
+								if(gFlag != tmaxNum){
+									gFlag = tmaxNum;
+									allFlag = 1;
+								}else{
+										allFlag = 0;
+								}
+								for( var i=tflag; i<=tmaxNum;i++){
+									if(document.getElementById("playback_sel_ch"+i+"").checked){
+										tcount++;
+									}else{
+									}
+								}
+								if(tcount == 4){
+									for(var i=0; i<RM.SYS.MAX_CHL_NUM;i++){
+										if(i<tflag ||  i>tmaxNum){
+											document.getElementById("playback_sel_ch"+i+"").disabled = true;
+											}
+									}
+									if((tflag-4) >= 0){
+										document.getElementById("checkedall_"+(tflag-4)+"").disabled = true;
+									}else if((tflag+4) < RM.SYS.MAX_CHL_NUM){
+										document.getElementById("checkedall_"+(tflag+4)+"").disabled = true;
+									}else{}
+								}else if(tcount>0){
+									for(var i=0; i<RM.SYS.MAX_CHL_NUM;i++){
+										if(i<tflag ||  i>tmaxNum){
+											document.getElementById("playback_sel_ch"+i+"").disabled = false;
+											}
+									}
+									if((tflag-4) >= 0){
+										document.getElementById("checkedall_"+(tflag-4)+"").disabled = true;
+									}else if((tflag+4) < RM.SYS.MAX_CHL_NUM){
+										document.getElementById("checkedall_"+(tflag+4)+"").disabled = true;
+									}else{}
+								}else{
+									
+								}
+								
+								/*for(var j = 0; j < RM.SYS.MAX_CHL_NUM;j++){
+										if(j == 0 || j == 4 || j == 8 || j == 12 || j == 16 || j == 20 || j == 24 || j == 28){
+											document.getElementById("checkedall_"+j+"").diabled = false;
+										}
+									}*/
+						}
+
+						  function checkedCHl(num)
+						  {
+								if(RM.SYS.product_type.split("_")[0]=="7116XE" || RM.SYS.product_type.split("_")[0]=="7116XC" || RM.SYS.product_type == "8632XH_VA"|| RM.SYS.product_type == "8832XH_VA"|| RM.SYS.product_type == "9208XH_VA"|| RM.SYS.MAX_CHL_NUM == 32){
+									if(checkeCount != "0" && allFlag == 1){
+										document.getElementById("checkedall_"+num+"").checked = false;
+										return;
+									}
+								}
+						  		if( document.getElementById("checkedall_"+num+"").checked )
+								{
+									for( var i=num; i<(num+4);i++)
+									{
+										//selectMaxForBy7116("playback_sel_ch"+i+"");
+										document.getElementById("playback_sel_ch"+i+"").checked = true;
+									}
+								}
+								else
+								{
+									for( var i=num; i<(num+4);i++)
+									{
+										document.getElementById("playback_sel_ch"+i+"").checked = false;
+									}
+								}
+						  }
+						</script>
+                       
+                    </li>
+                    <script type="text/javascript">
+                        if (RM.SYS.MAX_CHL_NUM > 4 && RM.SYS.MAX_CHL_NUM <= 8) {
+                            document.getElementById("playback_channel_border").style.height = '36px';
+                           // document.getElementById("playback_channel_label").style.height = '30px';
+                        }
+                        else if (RM.SYS.MAX_CHL_NUM > 8 && RM.SYS.MAX_CHL_NUM <= 16) {
+                            document.getElementById("playback_channel_border").style.height = '80px';
+                            //document.getElementById("playback_channel_label").style.height = '80px';
+                        }
+						//document.getElementById("playback_channel_label").style.height = '30px';
+                    </script>
+                    <li class="playback-search-opt-titleitem" style="*margin-top:3px">
+                        <label class='playback-search-type'>Тип:</label>
+                        <div id="playback_record_type_border" style="position:absolute; z-index:9999;"></div>
+	                    <script type="text/javascript">
+	                        var type = [{ value: 255, text: " Все" }, { value: 1, text: " Норм." }, { value: 254, text: " Тревога" }];
+	                        var typedrop = new rspDropbox("playback_record_type", "playback_record_type", type, "/HAPPLE/images/rspPlaybackdrop_bg.gif?" + RM.SYS.custName, 100, 22, 19, "onGetRecordPeriod()");
+	                         jQuery("#playback_record_type_border").html(typedrop.getHtml());            
+	                    </script>
+                    </li>
+                    <li class="playback-search-opt-titleitem">
+                        <label style="width:auto;" >Начало:</label>
+                       <!--<input type="text" id="playback_search_starttime" value="00:00:00"/>-->
+                       
+                    <div id="ContorStartTime"></div>
+                   <script>
+				   var timecontor=new timecontorInit("playbackStartHour","playbackStartMinute","playbackStartSecond",90,36,'00','00','00');
+				   $("#ContorStartTime").html(timecontor.RturnHtml());
+				   </script>
+                       
+                       	
+                        </li>
+ 
+                    
+                    <li class="playback-search-opt-titleitem" style="margin-top:15px;">
+                        <label style="width:auto">Окончание:</label>   <div id="ContorEndTime"></div>
+                   <script>
+					   var timecontor=new timecontorInit("playbackEndHour","playbackEndMinute","playbackEndSecond",100,36,23,59,59);
+					   $("#ContorEndTime").html(timecontor.RturnHtml());
+				   </script> </li>
+                      <!--  <input type="text" id="playback_search_endtime" value="23:59:59" />-->
+                    
+                      
+                 
+                    <li class="playback-search-opt-btn"  style="margin-top:25px;">
+                      <div id="btnSearch" class="playback-opt-btn" style="margin-top:5px;*margin-top:0px;margin-left:65px;_margin-left:35px" onclick="onGetRecordPeriod()" onmousemove="this.className='playback-opt-btn-over'" onmouseout="this.className='playback-opt-btn'" onmousedown="this.className='playback-opt-btn-down'" onmouseup="this.className='playback-opt-btn-over'">Поиск</div>
+                       
+                    </li>
+                </ul>
+                <div id="playback-list-info" style="margin-top:0px;">
+                </div>
+                <div id="playback-list-detail-link">
+                    <a href="javascript:showPeriodList(true)" onclick="cba()"><font id="playback_period_showbtn">Список записей>></font><font id="playback_period_hidebtn" style='display:none'>Просмотр>></font></a>
+                </div>
+	            
+	        </div>
+	    </div>
+	</div>
+	<!--the plug position-->
+	<div id="playback_ocx" style=" display:none">
+	   
+	</div>
+	<!--record list, default sytyle is hidden --><center>
+	<div id="playback_period_border" style="display:none; float:right;">
+	    <div class="playback-list" id="playback_list">
+	        <div class="playback-list-title-border">
+                <div class="playback-list-title" id="playback_list_title">
+                    <p class="pb_list_title_ch">Канал
+                    <input id="checkAll" type="checkbox" style="width:15px;height:15px;margin-bottom:-3px;*margin-bottom:1px;_margin-top:5px;" onclick="checkAll_box(this.id)"/></p>
+                    <p class="pb_list_title_tm">Начало</p>
+                    <p class="pb_list_title_tm">Окончание</p>
+                    <p class="pb_list_title_ch">Тип</p>
+                    <p class="pb_list_title_pro">Статус</p>
+                    <p class="pb_list_title_lock">&nbsp;</p>
+                </div>
+            </div>
+            <div class="playback-list-border">
+                
+            </div>
+            <div id="disa" style="width:530px;height:25px; text-align:center; margin-top:8px">
+            <div class="playback-opt-btn" onmousemove="this.className='playback-opt-btn-over'" onmouseout="this.className='playback-opt-btn'" onmousedown="this.className='playback-opt-btn-down';" onmouseup="this.className='playback-opt-btn-over'" onclick="pageAdd();">Первый</div>
+            
+            <div class="playback-opt-btn" onmousemove="this.className='playback-opt-btn-over'" onmouseout="this.className='playback-opt-btn'" onmousedown="this.className='playback-opt-btn-down';" onmouseup="this.className='playback-opt-btn-over'" onclick="pageUp();">Пред.</div>
+            
+            <div class="playback-opt-btn" onmousemove="this.className='playback-opt-btn-over'" onmouseout="this.className='playback-opt-btn'" onmousedown="this.className='playback-opt-btn-down';" onmouseup="this.className='playback-opt-btn-over'" onclick="pageNext();">След.</div>
+            
+            <div class="playback-opt-btn" onmousemove="this.className='playback-opt-btn-over'" onmouseout="this.className='playback-opt-btn'" onmousedown="this.className='playback-opt-btn-down';" onmouseup="this.className='playback-opt-btn-over'" id="pageLast" onclick="pageLast();">Посл</div>
+            
+            
+             <div id="btnBackup" class="playback-opt-btn" onclick="onStartPlayback()" onmousemove="this.className='playback-opt-btn-over'" onmouseout="this.className='playback-opt-btn'" onmousedown="this.className='playback-opt-btn-down'" onmouseup="this.className='playback-opt-btn-over'">Архив</div>
+            
+          <label id="pageF" style="color:#FFF;">Страница</label>  <label id="page" style="color:#FFF">1</label><label id="gang" style="color:#FFF">/</label><label id="pagecount" style="color:#FFF">1</label> <label id="kong" style="color:#FFF"></label>
+            </div>
+            </center>
+            <script type="text/javascript">
+				 if ('CUSTOMER_SAFARI' == 'CUSTOMER_CALSYS'  || 'CUSTOMER_SAFARI' == 'CUSTOMER_CALSYS_NEUTRAL'){
+					  document.getElementById("pageF").style.color = "#66F"
+					  document.getElementById("page").style.color = "#66F";
+					  document.getElementById("gang").style.color = "#66F";
+					  document.getElementById("pagecount").style.color = "#66F";
+					  document.getElementById("kong").style.color = "#66F";
+					 }
+                var listobj = new rspPlaybackList("playbackList", 201, 20, "/HAPPLE/images/waiting.gif", "/HAPPLE/images/playback_process.jpg", "/HAPPLE/images/canner.png");
+                jQuery(".playback-list-border").html(listobj.getHtml());
+                listobj.setCancelFun("cancelPlayback");
+				function cba()
+				{
+					ikp=0;
+				}
+				function pageAdd(){
+					checkedNum = 0;
+					pageNum=0;
+					curn_page();
+					$("#page").html(''+parseInt(parseInt(parseInt(pageNum))+1)+'');
+					
+					if(checkedNum == 20)
+					{
+						document.getElementById("checkAll").checked = true;
+					}
+					else
+					{
+						document.getElementById("checkAll").checked = false;
+					}
+				}
+				function pageNext(){
+					checkedNum = 0;
+					if(parseInt(parseInt(pageNum)+1)<parseInt(rsp_getCookie("pageCount"))){
+						pageNum=parseInt(parseInt(pageNum)+1);
+						curn_page();
+						$("#page").html(''+parseInt(parseInt(pageNum)+1)+'');
+					}
+					if(checkedNum == 20)
+					{
+						document.getElementById("checkAll").checked = true;
+					}
+					else
+					{
+						document.getElementById("checkAll").checked = false;
+					}
+				}
+				function pageUp(){
+					checkedNum = 0;
+					if(parseInt(parseInt(pageNum)-1)>=0){
+						pageNum=parseInt(pageNum-1);
+						curn_page();
+						$("#page").html(''+parseInt(parseInt(pageNum)+1)+'');
+					}
+					
+					if(checkedNum == 20)
+					{
+						document.getElementById("checkAll").checked = true;
+					}
+					else
+					{
+						document.getElementById("checkAll").checked = false;
+					}
+				}
+				function pageLast(){
+					checkedNum = 0;
+					if(rsp_getCookie("pageCount") == "")
+					{
+						pageNum = 0;
+					}
+					else
+					{
+						pageNum=parseInt(parseInt(rsp_getCookie("pageCount"))-1);
+					}
+					curn_page();
+					$("#page").html(''+parseInt(parseInt(pageNum)+1)+'');
+					
+					if(checkedNum == 20)
+					{
+						document.getElementById("checkAll").checked = true;
+					}
+					else
+					{
+						document.getElementById("checkAll").checked = false;
+					}
+				}
+            </script>
+        </div>
+	</div>
+	<div class="clear"></div>
+</div>
+
+
+</div>
+<div id="content_body_border_configure" style="display:none">
+<script src="/HAPPLE/pages/JS/page.js?v192" type="text/javascript"></script>
+
+<script src="/HAPPLE/pages/JS/shezhi.js?v192" type="text/javascript"></script>
+
+
+<div class="playback_content_left" id="playback_content_left">
+    <div class="playback_content_left_left" id="playback_content_left_left">
+        <div class="left_oneDiv" style="text-align:center">
+            <ul>
+                <li class="background" style="margin-top:2px" onmouseover="onmouseClass('li_1')" id="li_1" onmouseout="onmouseRemove('li_1')" loadPage="/LoadPage/SystemMessage.rsp">
+                    <div class="one"> <div class="left_bg_1 png"></div><font class="font_size">Информация</font></div>
+                </li>
+                
+                <li onmouseover="onmouseClass('li_2')" id="li_2" onmouseout="onmouseRemove('li_2')" loadPage="/timeset.rsp">
+                    <div class="one"> <div class="left_bg_2 png"></div><font class="font_size">Дата/Время</font></div>
+                </li>
+                
+                <li onmouseover="onmouseClass('li_3')" id="li_3" onmouseout="onmouseRemove('li_3')" loadPage="/LoadPage/DisplaySettings.rsp">
+                    <div class="one"> <div class="left_bg_3 png"></div><font class="font_size">Дисплей</font></div>
+                </li>
+                
+              
+                <li onmouseover="onmouseClass('li_4')" id="li_4" onmouseout="onmouseRemove('li_4')" loadPage="/LoadPage/ImageSetting.rsp">
+                    <div class="one"> <div class="left_bg_4 png"></div><font class="font_size">画面设置</font></div>
+                </li>
+                
+                <li onmouseover="onmouseClass('li_8')" id="li_8" onmouseout="onmouseRemove('li_8')" loadPage="/LoadPage/VideoSettings.rsp">
+                    <div class="one"> <div class="left_bg_8 png"></div><font class="font_size">Запись</font></div>
+                </li>
+                
+                 <li onmouseover="onmouseClass('li_13')" id="li_13" onmouseout="onmouseRemove('li_13')" loadPage="/LoadPage/UserManager.rsp">
+                    <div class="one"> <div class="left_bg_10 png"></div><font class="font_size">Пользователи</font></div>
+                </li>
+                
+                <li onmouseover="onmouseClass('li_10')" id="li_10" onmouseout="onmouseRemove('li_10')" loadPage="/LoadPage/AlarmSet.rsp"> 
+                    <div class="one"> <div class="left_bg_14 png"></div><font class="font_size">Тревога</font></div>
+                </li>
+                
+                <li onmouseover="onmouseClass('li_5')" id="li_5" onmouseout="onmouseRemove('li_5')" loadPage="/right.rsp">
+                    <div class="one"> <div class="left_bg_5 png"></div><font class="font_size">Сеть</font></div>
+                </li>
+                <li onmouseover="onmouseClass('li_6')" id="li_6" onmouseout="onmouseRemove('li_6')" loadPage="/LoadPage/NetworkService/NetworkServiceddns.rsp">
+                    <div class="one"> <div class="left_bg_6 png"></div><font class="font_size">COMM</font></div>
+                </li>
+                
+                <li onmouseover="onmouseClass('li_7')" id="li_7" onmouseout="onmouseRemove('li_7')" loadPage="/LoadPage/Remote.rsp">
+                    <div class="one"> <div class="left_bg_6 png"></div><font class="font_size">STR_RemoteDevice</font></div>
+                </li>
+                
+                <li onmouseover="onmouseClass('li_12')" id="li_12" onmouseout="onmouseRemove('li_12')" loadPage="/LoadPage/SystemManagement.rsp">
+                    <div class="one"> <div class="left_bg_13 png"></div><font class="font_size">Управление системой</font></div>
+                </li>
+                
+                 <li onmouseover="onmouseClass('li_15')" id="li_15" onmouseout="onmouseRemove('li_15')" loadPage="/LoadPage/AlermLink.rsp">
+                    <div class="one"> <div class="left_bg_15 png"></div><font class="font_size">LINK ALARM</font></div>
+                </li>
+               
+                <li onmouseover="onmouseClass('li_14')" id="li_14" onmouseout="onmouseRemove('li_14')" style="border-bottom:1px solid #3F3F3F;" loadPage="/LoadPage/localSetting.rsp">
+                    <div class="one"> <div class="left_bg_12 png"></div><font class="font_size">Локальные установки</font></div>
+                </li>
+                <li onmouseover="onmouseClass('li_16')" id="li_16" onmouseout="onmouseRemove('li_16')" style="border-bottom:1px solid #3F3F3F;" loadPage="/LoadPage/LogSearch.rsp">
+                    <div class="one"> <div class="left_bg_16 png"></div><font class="font_size">Лог</font></div>
+                </li>
+                <script type="text/javascript">
+					var custName='CUSTOMER_SAFARI';
+					if(custName == "CUSTOMER_CALSYS" || custName == "CUSTOMER_CALSYS_NEUTRAL"){
+						jQuery("#li_14").removeAttr("style");
+						jQuery("#li_16").attr("style","border-bottom:1px solid #c1c7c8");
+					}
+					if(RM.SYS.MAX_CHL_NUM!=1){
+						document.getElementById("li_4").style.display="none";
+					}
+				
+					if( RM.SYS.alarmLink != "true" ){
+						document.getElementById("li_15").style.display="none";
+					}
+					if(RM.SYS.product_type != "9004XH_VA")
+					{
+						document.getElementById("li_7").style.display="none";
+					}
+               		if(jQuery("#head-border").attr("class")==undefined){
+						jQuery("#li_14").hide();
+						jQuery("#li_12").css("border-bottom","1px solid #3F3F3F");
+					}
+               </script>
+                <!-- <li onmouseover="onmouseClass('li_14')" id="li_14" onmouseout="onmouseRemove('li_14')" style="border-bottom:1px solid #3F3F3F;">
+                <div class="one"> <div class="left_bg_14 png"></div><font class="font_size">本地设置</font></div>
+                </li>-->
+            </ul>
+        </div>
+    </div>
+    <div class="left_hideOrshow" >
+        <img src="/HAPPLE/pages/images/hideOrshowLeft.bmp" alt="" id="configImageremoves" style="width:6px;"/>
+    </div>
+</div>
+
+
+<div class="playback_conten_right" id="playback_conten_right">
+
+</div>
+<script type="text/javascript">
+	//get_VSA();
+    if (document.getElementById("ipad_flag")) {
+        showConfigurePage();
+    }
+/*
+    RM.frame.changeUrl("/left.rsp", 1);
+    RM.plug.hidePlug();    */
+</script>
+
+</div>
+
+<script type="text/javascript">
+    function loadDefaultParam() {
+        var defaultParam = new rspConfigure("sys_default_param", RM.SYS.MAX_CHL_NUM);
+        defaultParam.getDefaultParamAllFromDevice();
+    }
+    function loadPage() {
+        var obj = document.getElementById("dvrplug");
+		if(obj && typeof(obj.Login) != 'undefined' &&!RM.frame.getDevice()){
+            setTimeout("loadPage()",100);
+            return;
+        }
+        setTimeout("loadDefaultParam()", 2000);
+        var curPage = '/liveView.rsp';
+        var pages = window.document.URL.split("#");
+        if (pages.length > 1) {
+            curPage = pages[1];
+        }
+		if(curPage == "/left.rsp")
+		{
+			jQuery.fn.sysTips({title:RM.language.SystemTips,tips:RM.language.LoadingParameter,type:'-1'});
+		}
+        RM.frame.loadPage(curPage);
+        
+    }
+    if (document.getElementById("dvrplug") && typeof (document.getElementById("dvrplug").SetLanguageString) != 'undefined') {
+        var dvrobj = document.getElementById("dvrplug");
+        dvrobj.SetLanguageString(0, "IE_Open", "Открытие...");
+        dvrobj.SetLanguageString(0, "IE_OpenFailed", "Ошибка открытия");
+        dvrobj.SetLanguageString(0, "IE_OpenWindow", "Откр. окно");
+        dvrobj.SetLanguageString(0, "IE_CloseWindow", "Закрыть окно");
+        dvrobj.SetLanguageString(0, "IE_OpenAll", "Открыть все окна");
+        dvrobj.SetLanguageString(0, "IE_CloseAll", "Закрыть все окна");
+        dvrobj.SetLanguageString(0, "STR_START_MANUAL_RECORD", "Старт записи");
+        dvrobj.SetLanguageString(0, "STR_STOP_MANUAL_RECORD", "Стоп записи");
+        dvrobj.SetLanguageString(0, "IE_FullScreem", "Полный экран");
+        dvrobj.SetLanguageString(0, "IE_ExitFullScreem", "Выход из полн.экрана");
+        dvrobj.SetLanguageString(0, "IE_Reconn", "Переподключение...");
+        dvrobj.SetLanguageString(0, "STR_Playing", "Воспр.");
+        dvrobj.SetLanguageString(0, "IE_PlaybackStop", "Стоп");
+        dvrobj.SetLanguageString(0, "IE_PlaybackPause", "Пауза");
+        dvrobj.SetLanguageString(0, "IE_PlaybackSpeed", "Скорость");
+        dvrobj.SetLanguageString(0, "IE_PlaybackSlow", "Медленно");
+        dvrobj.SetLanguageString(0, "IE_PlaybackNextFrame", "След. кадр");
+        dvrobj.SetLanguageString(0, "STR_CH", "Канал");
+        dvrobj.SetLanguageString(0, "IE_CAPTURE_IMAGES", "Захват");
+        dvrobj.SetLanguageString(0, "IE_PlaybackBarZoomIn", "Ближе");
+        dvrobj.SetLanguageString(0, "IE_PlaybackBarZoomOut", "Дальше");
+        dvrobj.SetLanguageString(0, "IE_Buffering", "Буферизация...");
+        dvrobj.SetLanguageString(0, "IE_PlaybackFailed", "Ошибка воспроизведения");
+        dvrobj.SetLanguageString(0, "IE_NetworkError", "Плохая сеть");
+        dvrobj.SetLanguageString(0, "IE_DVRoffline", "Нет связи");
+        dvrobj.SetLanguageString(0, "IE_NoPower", "Нет доступа");
+        dvrobj.SetLanguageString(0, "IE_UnkownErr", "IE_UnkownErr");
+        dvrobj.SetLanguageString(0, "STR_MON.", "Пон.");
+        dvrobj.SetLanguageString(0, "STR_TUE.", "Вт.");
+        dvrobj.SetLanguageString(0, "STR_WED.", "Ср.");
+        dvrobj.SetLanguageString(0, "STR_THU.", "Чт.");
+        dvrobj.SetLanguageString(0, "STR_FRI.", "Птн.");
+        dvrobj.SetLanguageString(0, "STR_SAT.", "Сб.");
+        dvrobj.SetLanguageString(0, "STR_SUN.", "Вс.");
+        dvrobj.SetLanguageString(0, "STR_ADD PLAN", "Доб");
+        dvrobj.SetLanguageString(0, "STR_OK", "OK");
+        dvrobj.SetLanguageString(0, "STR_DELETE PLAN", "Удалить");
+        dvrobj.SetLanguageString(0, "STR_RECORD TYPE", "Тип");
+        dvrobj.SetLanguageString(0, "STR_NORMAL", "Норм.");
+        dvrobj.SetLanguageString(0, "STR_ALARM", "Тревога");
+        dvrobj.SetLanguageString(0, "STR_TIMER RECORD", "Период тревоги");
+        dvrobj.SetLanguageString(0, "TR_NONE ALARM PLAN", "Нет");
+		dvrobj.SetLanguageString(0, "STR_RECORD MANUAL", "Ручной");
+        dvrobj.SetLanguageString(0, "STR_START TIME", "Начало");
+        dvrobj.SetLanguageString(0, "STR_END TIME", "Окончание");
+		dvrobj.SetLanguageString(0,"DIALOG_TimeInputError","Ошибка ввода времени.");
+		dvrobj.SetLanguageString(0,"DIALOG_Warning","Предупреждение");
+		dvrobj.SetLanguageString(0,"IE_Substream_noencode","no encode");
+		
+		dvrobj.SetLanguageString(0,"STR_PRE_VOLUME","Громкость");
+		dvrobj.SetLanguageString(0,"STR_Four screen","4 экрана");
+		dvrobj.SetLanguageString(0,"IE_Nine Channel","9 каналов");
+		dvrobj.SetLanguageString(0,"STR_Sixteen screen","16 экранов");
+		dvrobj.SetLanguageString(0,"IE_PreChannel","Пред. страница");
+		dvrobj.SetLanguageString(0,"IE_Next Channel","След. страница");
+		dvrobj.SetLanguageString(0,"IE_ViewWindowMode","Оригинал/В полном окне");
+		dvrobj.SetLanguageString(0,"IE_PlaybackOver","Playback Over");
+		dvrobj.SetLanguageString(0,"STR_ZOOM","Цифровое увеличение");
+		
+		dvrobj.SetLanguageString(0,"IE_AVI_CONVERTER","AVI Converter");
+		dvrobj.SetLanguageString(0,"IE_IMPORT_H246_FILE","Import H.264 file");
+		dvrobj.SetLanguageString(0,"IE_SAVA_AS_AVI","save as *.avi");
+		dvrobj.SetLanguageString(0,"IE_CONVERT","Convert");
+		dvrobj.SetLanguageString(0,"IE_PLEASE_IMPORT_RECORD","Please import H.264 record file!");
+		dvrobj.SetLanguageString(0,"IE_PLEASE_SETAVI_PATHWAY","Please set AVI file pathway!");
+		dvrobj.SetLanguageString(0,"IE_OPEN_FILE_FAILED","Open H.264 file failed!");
+		dvrobj.SetLanguageString(0,"IE_READ_FILE_FAILED","Read H.264 file failed!");
+		dvrobj.SetLanguageString(0,"IE_FILE_INVALIDATE","H.264 file invalidate!");
+		dvrobj.SetLanguageString(0,"IE_CONVERSION_PROCESS","Conversion process");
+		dvrobj.SetLanguageString(0,"IE_HDD_SPACE_NOTENOUGH","HDD space not enough!");
+		dvrobj.SetLanguageString(0,"IE_FILE_CONVERTING","File is converting now, please wait a moment...");
+		
+    }
+    jQuery(document).ready( loadPage() );
+</script>
+
+
+ 
+ 
+
+<script type="text/javascript">
+    if ('CUSTOMER_SAFARI' == 'CUSTOMER_CALSYS' || 'CUSTOMER_SAFARI' == 'CUSTOMER_CALSYS_NEUTRAL') {
+        document.getElementById("configImageremoves").src = '/HAPPLE/pages/images/hideOrshowLeft.bmp?' + RM.SYS.custName;
+        document.getElementById("imageremoves").src = '/HAPPLE/pages/images/hideOrshowLeft.bmp?' + RM.SYS.custName;
+    }
+</script>
+</body>
+
+</html>
