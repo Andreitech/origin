@@ -1,5 +1,5 @@
 ##shodan
-API_KEY=PSKINdQe1GyxGgecYz2191H2JoS9qvgD
+API_KEY=
 echo "API=$API_KEY"
 echo Введите код страны
 read cod
